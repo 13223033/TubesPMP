@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "dasar.h"
 
 
 char** imp_split(const char* str, char delimiter, int* count) 
@@ -23,7 +24,7 @@ char** imp_split(const char* str, char delimiter, int* count)
         char c = str[i];                        // Ambil karakter satu per satu dari string input
 
         if (c == delimiter || c == '\0') {      // Jika karakter adalah delimiter atau akhir string
-            buffer[buf_index] = '\0';           // Akhiri string sementara di buffer dengan null terminator
+            buffer[buf_index] = '\0';           // Akhiri string sementara di buffer dengan null terminator string
             result[*count] = strdup(buffer);    // Duplikasi buffer ke memori heap dan simpan di array result
             (*count)++;                         // Tambah jumlah elemen hasil split
             buf_index = 0;                      // Reset buffer untuk kata berikutnya
