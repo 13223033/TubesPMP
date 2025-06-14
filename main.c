@@ -14,7 +14,7 @@ int main() {
 
     print_dokter_list(dokter_list, jumlah_dokter);
 
-    // Tambahkan 1 dokter baru
+    // Tambahkan 1 dokter baru, sebagai contoh
     if (jumlah_dokter < 100) {
         Dokter baru;
         baru.id = dokter_list[jumlah_dokter - 1].id + 1; // id baru otomatis
@@ -31,7 +31,7 @@ int main() {
         printf("\nKapasitas penuh, tidak bisa tambah dokter baru.\n\n");
     }
 
-    // Cetak ulang dan simpan
+    // Print ulang dan simpan ke csv
     print_dokter_list(dokter_list, jumlah_dokter);
     dokter_to_csv("data_dokter.csv", dokter_list, jumlah_dokter);
 
@@ -40,7 +40,7 @@ int main() {
 
     if (jumlah_jadwal > 0) {
         print_jadwal_list(jadwal_list, jumlah_jadwal);
-        jadwal_to_csv("jadwal.csv", jadwal_list, jumlah_jadwal); // atau simpan ke file lain
+        jadwal_to_csv("jadwal.csv", jadwal_list, jumlah_jadwal); // Ini ga diubah apa-apa, cuma print ulang
     }
 
 
