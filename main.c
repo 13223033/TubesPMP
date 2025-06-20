@@ -1,48 +1,40 @@
-// main.c
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include "dasar.h"
+#include "baca_file.h"
+
+#define MAX_DOKTER 100
+#define MAX_JADWAL 31  // Anggap maksimal 31 hari
 
 int main() {
-    Dokter dokter_list[100];
-    int jumlah_dokter = csv_to_dokter("data_dokter.csv", dokter_list, 100);
+    // Array dokter dan jadwal
+    Dokter dokter_list[MAX_DOKTER];
+    Jadwal jadwal_list[MAX_JADWAL];
 
-    if (jumlah_dokter < 0) {
-        printf("Terjadi kesalahan saat membaca file.\n");
+    // Baca data dari file CSV
+    int jumlah_dokter = csv_to_dokter("data_dokter.csv", dokter_list, MAX_DOKTER);
+    int jumlah_jadwal = csv_to_jadwal("jadwal.csv", jadwal_list, MAX_JADWAL);
+
+    // Validasi
+    if (jumlah_dokter < 0 || jumlah_jadwal < 0) {
+        printf("Gagal membaca data dari file.\n");
         return 1;
     }
 
-    print_dokter_list(dokter_list, jumlah_dokter);
+    // Tampilkan data
+    baca_dokter(dokter_list, jumlah_dokter);
+    baca_jadwal(jadwal_list, jumlah_jadwal);
 
-    // Tambahkan 1 dokter baru, sebagai contoh
-    if (jumlah_dokter < 100) {
-        Dokter baru;
-        baru.id = dokter_list[jumlah_dokter - 1].id + 1; // id baru otomatis
-        strcpy(baru.nama, "Andi");
-        baru.maks_shift = 20;
-        baru.pagi = 1;
-        baru.siang = 0;
-        baru.malam = 1;
+    // Simpan ulang untuk uji write
+    dokter_to_csv("dokter_output.csv", dokter_list, jumlah_dokter);
+    jadwal_to_csv("jadwal_output.csv", jadwal_list, jumlah_jadwal);
 
-        dokter_list[jumlah_dokter] = baru;
-        jumlah_dokter++; // penting!
-        printf("\nData dokter baru ditambahkan.\n\n");
-    } else {
-        printf("\nKapasitas penuh, tidak bisa tambah dokter baru.\n\n");
+    // Bebaskan memori dari alokasi array dinamis dalam Jadwal
+    for (int i = 0; i < jumlah_jadwal; i++) {
+        free(jadwal_list[i].pagi);
+        free(jadwal_list[i].siang);
+        free(jadwal_list[i].malam);
     }
-
-    // Print ulang dan simpan ke csv
-    print_dokter_list(dokter_list, jumlah_dokter);
-    dokter_to_csv("data_dokter.csv", dokter_list, jumlah_dokter);
-
-    Jadwal jadwal_list[100];
-    int jumlah_jadwal = csv_to_jadwal("jadwal.csv", jadwal_list, 100);
-
-    if (jumlah_jadwal > 0) {
-        print_jadwal_list(jadwal_list, jumlah_jadwal);
-        jadwal_to_csv("jadwal.csv", jadwal_list, jumlah_jadwal); // Ini ga diubah apa-apa, cuma print ulang
-    }
-
 
     return 0;
 }
