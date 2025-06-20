@@ -9,14 +9,17 @@ typedef struct {
     int pagi;
     int siang;
     int malam;
+    int shift_assigned;
 } Dokter;
 
 // Struktur Jadwal
 typedef struct {
-    int tanggal;
-    int pagi;
-    int siang;
-    int malam;
+    int *pagi;
+    int *siang;
+    int *malam;
+    int jumlah_pagi;
+    int jumlah_siang;
+    int jumlah_malam;
 } Jadwal;
 
 // Fungsi-fungsi Dokter
@@ -28,5 +31,10 @@ void dokter_to_csv(const char *filename, const Dokter *list, int jumlah);
 int csv_to_jadwal(const char *filename, Jadwal *jadwal_list, int max_jadwal);
 void print_jadwal_list(const Jadwal *list, int jumlah);
 void jadwal_to_csv(const char *filename, const Jadwal *list, int jumlah);
+void free_jadwal_list(Jadwal *jadwal_list, int jumlah);
+
+// Utilitas
+int *parse_id_list(const char *str, int *jumlah);
+void join_id_list(char *buffer, const int *arr, int jumlah);
 
 #endif
