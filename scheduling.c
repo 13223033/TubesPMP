@@ -2,28 +2,6 @@
 #include <stdlib.h>
 #include "scheduling.h"
 
-typedef struct {
-    int id;
-    char nama[100];
-    int maks_shift;
-    int pagi;
-    int siang;
-    int malam;
-    int shift_assigned;
-} Dokter;
-
-typedef struct{
-    int *pagi;
-    int *siang;
-    int *malam;
-    int jumlah_pagi;
-    int jumlah_siang;
-    int jumlah_malam;
-} Jadwal;
-
-Dokter daftar_dokter[100];
-Jadwal list_jadwal[7];
-
 int cek_1preferensi(Dokter daftar_dokter[100], int indeks_dokter){
     int preferensi = 0;
     if (daftar_dokter[indeks_dokter].pagi == 1){ // hanya pagi
