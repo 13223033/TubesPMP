@@ -3,6 +3,18 @@
 #include <string.h>
 #include "dasar.h"
 
+/* Function Dasar Cari Index Dokter sesuai ID*/
+int FindIdx(Dokter dokter_list[], int id, int jumlah_dokter) {
+    int idx;
+    for (int i = 0; i < jumlah_dokter; i++) {
+        if (dokter_list[i].id == id) {
+            idx = i;
+            break;
+        }
+    }
+    return(idx);
+}
+
 /* Function Pelanggaran Spesifik Dokter*/
 // Harian
 void PelanggaranDokterHarian(Dokter dokter, Jadwal jadwal, int *totalpelanggaran) {
@@ -46,11 +58,12 @@ void PelanggaranDokterBulanan(Dokter dokter, Jadwal jadwal[], int *totalpelangga
 
 /* Function Pelanggaran Nonspesifik Dokter (Total)*/
 // Harian
-void PelanggaranTotalHarian(Dokter dokter[], Jadwal jadwal, int *totalpelanggaran) {
+void PelanggaranTotalHarian(Dokter dokter[], Jadwal jadwal, int jumlah_dokter, int *totalpelanggaran) {
     // pelanggaran pagi
     for (int i = 0; i < jadwal.jumlah_pagi; i++) {
         int id = jadwal.pagi[i];
-        if (!dokter[id].pagi) {
+        int idx = FindIdx(dokter, id, jumlah_dokter);
+        if (!dokter[idx].pagi) {
             (*totalpelanggaran)++;
         }
     }
@@ -58,7 +71,8 @@ void PelanggaranTotalHarian(Dokter dokter[], Jadwal jadwal, int *totalpelanggara
     // pelanggaran siang
     for (int i = 0; i < jadwal.jumlah_siang; i++) {
         int id = jadwal.siang[i];
-        if (!dokter[id].siang) {
+        int idx = FindIdx(dokter, id, jumlah_dokter);
+        if (!dokter[idx].siang) {
             (*totalpelanggaran)++;
         }
     }
@@ -66,62 +80,64 @@ void PelanggaranTotalHarian(Dokter dokter[], Jadwal jadwal, int *totalpelanggara
     // pelanggaran malam
     for (int i = 0; i < jadwal.jumlah_malam; i++) {
         int id = jadwal.malam[i];
-        if (!dokter[id].malam) {
+        int idx = FindIdx(dokter, id, jumlah_dokter);
+        if (!dokter[idx].malam) {
             (*totalpelanggaran)++;
         }
     }
 }
 
 // Mingguan
-void PelanggaranTotalMingguan(Dokter dokter[], Jadwal jadwal[], int *totalpelanggaran) {
+void PelanggaranTotalMingguan(Dokter dokter[], Jadwal jadwal[], int jumlah_dokter, int *totalpelanggaran) {
     for (int i = 0; i < 7; i++) {
-        PelanggaranTotalHarian(dokter, jadwal[i], totalpelanggaran);
+        PelanggaranTotalHarian(dokter, jadwal[i], jumlah_dokter, totalpelanggaran);
     }
 }
 
 // Bulanan
-void PelanggaranTotalBulanan(Dokter dokter[], Jadwal jadwal[], int *totalpelanggaran) {
-    PelanggaranTotalMingguan(dokter, jadwal, totalpelanggaran);
+void PelanggaranTotalBulanan(Dokter dokter[], Jadwal jadwal[], int jumlah_dokter, int *totalpelanggaran) {
+    PelanggaranTotalMingguan(dokter, jadwal, jumlah_dokter, totalpelanggaran);
     (*totalpelanggaran) *= 4;
 
-    PelanggaranTotalHarian(dokter, jadwal[0], totalpelanggaran);
-    PelanggaranTotalHarian(dokter, jadwal[1], totalpelanggaran);
+    PelanggaranTotalHarian(dokter, jadwal[0], jumlah_dokter, totalpelanggaran);
+    PelanggaranTotalHarian(dokter, jadwal[1], jumlah_dokter, totalpelanggaran);
 }
 
 /* Function utama, print pelanggaran*/
 // Spesifikasi:
-// id           : index dokter, spesifik ikuti index, nonspesifik = -1
-// hari         : index hari, spesifik ikuti index, nonspesifik pakai 0 saja
+// id           : id dokter, spesifik ikuti id, nonspesifik = 0
+// hari         : index hari, spesifik ikuti index, nonspesifik = 0
 // tipewaktu    : harian 0, mingguan 1, bulanan 2
-void PrintPelanggaran(Dokter dokter[], Jadwal jadwal[], int id, int hari, int tipewaktu) {
+void PrintPelanggaran(Dokter dokter[], Jadwal jadwal[], int jumlah_dokter, int id, int hari, int tipewaktu) {
     int totalpelanggaran = 0;
 
-    if (id == -1) {     // Nonspesifik dokter (pelanggaran total)
+    if (id == 0) {     // Nonspesifik dokter (pelanggaran total)
         switch (tipewaktu) {
             case 0:
-                PelanggaranTotalHarian(dokter, jadwal[hari], &totalpelanggaran);
+                PelanggaranTotalHarian(dokter, jadwal[hari], jumlah_dokter, &totalpelanggaran);
                 break;
             case 1:
-                PelanggaranTotalMingguan(dokter, jadwal, &totalpelanggaran);
+                PelanggaranTotalMingguan(dokter, jadwal, jumlah_dokter, &totalpelanggaran);
                 break;
             case 2:
-                PelanggaranTotalBulanan(dokter, jadwal, &totalpelanggaran);
+                PelanggaranTotalBulanan(dokter, jadwal, jumlah_dokter, &totalpelanggaran);
         }
     } else {            // Spesifik dokter (pelanggaran dokter)
+        int idx = FindIdx(dokter, id, jumlah_dokter);
         switch (tipewaktu) {
             case 0:
-                PelanggaranDokterHarian(dokter[id], jadwal[hari], &totalpelanggaran);
+                PelanggaranDokterHarian(dokter[idx], jadwal[hari], &totalpelanggaran);
                 break;
             case 1:
-                PelanggaranDokterMingguan(dokter[id], jadwal, &totalpelanggaran);
+                PelanggaranDokterMingguan(dokter[idx], jadwal, &totalpelanggaran);
                 break;
             case 2:
-                PelanggaranDokterBulanan(dokter[id], jadwal, &totalpelanggaran);
+                PelanggaranDokterBulanan(dokter[idx], jadwal, &totalpelanggaran);
         }
     }
 
-    printf("%s %s: %d\n",
-        id == -1 ? "Total pelanggaran" : "Pelanggaran",
+    printf("%s jadwal %s: %d\n",
+        id == 0 ? "Total pelanggaran" : "Pelanggaran",
         tipewaktu == 0 ? "harian" : tipewaktu == 1 ? "mingguan" : "bulanan",
         totalpelanggaran);
 } 
