@@ -1,0 +1,363 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "scheduling.h"
+
+typedef struct {
+    int id;
+    char nama[100];
+    int maks_shift;
+    int pagi;
+    int siang;
+    int malam;
+    int shift_assigned;
+} Dokter;
+
+typedef struct{
+    int *pagi;
+    int *siang;
+    int *malam;
+    int jumlah_pagi;
+    int jumlah_siang;
+    int jumlah_malam;
+} Jadwal;
+
+Dokter daftar_dokter[100];
+Jadwal list_jadwal[7];
+
+int cek_1preferensi(Dokter daftar_dokter[100], int indeks_dokter){
+    int preferensi = 0;
+    if (daftar_dokter[indeks_dokter].pagi == 1){ // hanya pagi
+        if (daftar_dokter[indeks_dokter].siang == 0 && daftar_dokter[indeks_dokter].malam == 0){
+            preferensi = 1;
+        }
+    }
+    else if (daftar_dokter[indeks_dokter].siang == 1){ // hanya siang
+        if (daftar_dokter[indeks_dokter].pagi == 0 && daftar_dokter[indeks_dokter].malam == 0){
+            preferensi = 2;
+        }
+    }
+    else if (daftar_dokter[indeks_dokter].malam == 1){ // hanya malam
+        if (daftar_dokter[indeks_dokter].pagi == 0 && daftar_dokter[indeks_dokter].siang == 0){
+            preferensi = 3;
+        }
+    }
+    return preferensi;
+}
+
+void isi_jadwal(Dokter daftar_dokter[100], Jadwal list_jadwal[7], int *hari, int indeks_dokter, int pref){
+    if (pref == 1){ // pagi
+        list_jadwal[*hari].pagi = realloc(list_jadwal[*hari].pagi, (list_jadwal[*hari].jumlah_pagi + 1) * sizeof(int));
+        list_jadwal[*hari].pagi[list_jadwal[*hari].jumlah_pagi] = daftar_dokter[indeks_dokter].id;
+        list_jadwal[*hari].jumlah_pagi++;
+    }
+    else if (pref == 2){ // siang
+        list_jadwal[*hari].siang = realloc(list_jadwal[*hari].siang, (list_jadwal[*hari].jumlah_siang + 1) * sizeof(int));
+        list_jadwal[*hari].siang[list_jadwal[*hari].jumlah_siang] = daftar_dokter[indeks_dokter].id;
+        list_jadwal[*hari].jumlah_siang++;
+    }
+    else if (pref == 3){ // malam
+        list_jadwal[*hari].malam = realloc(list_jadwal[*hari].malam, (list_jadwal[*hari].jumlah_malam + 1) * sizeof(int));
+        list_jadwal[*hari].malam[list_jadwal[*hari].jumlah_malam] = daftar_dokter[indeks_dokter].id;
+        list_jadwal[*hari].jumlah_malam++;
+    }
+    daftar_dokter[indeks_dokter].shift_assigned++;
+    *hari = *hari + 1;
+}
+
+int shift_prioritas(Dokter daftar_dokter[100], int jumlah_dokter, int hari_pagi, int hari_siang, int hari_malam){
+    // hitung kekosongan tiap shift
+    int pagi_kosong = 7 - hari_pagi;
+    int siang_kosong = 7 - hari_siang;
+    int malam_kosong = 7 - hari_malam;
+
+    int available_pagi = 0; int available_siang = 0; int available_malam = 0;
+
+    // hitung berapa banyak dokter yang bisa mengisi
+    for (int i = 0; i < jumlah_dokter; i++){
+        if (daftar_dokter[i].pagi == 1){
+            available_pagi += (daftar_dokter[i].maks_shift - daftar_dokter[i].shift_assigned);
+        }
+        if (daftar_dokter[i].siang == 1){
+            available_siang += (daftar_dokter[i].maks_shift - daftar_dokter[i].shift_assigned);
+        }
+        if (daftar_dokter[i].malam == 1){
+            available_malam += (daftar_dokter[i].maks_shift - daftar_dokter[i].shift_assigned);
+        }
+    }
+
+    // pilih shift prioritas
+    int skor_pagi = available_pagi - pagi_kosong;
+    int skor_siang = available_siang - siang_kosong;
+    int skor_malam = available_malam - malam_kosong;
+
+    int a, b, c;
+    a = b = c = 10000;
+
+    if (hari_pagi < 7) a = skor_pagi;
+    if (hari_siang < 7) b = skor_siang;
+    if (hari_malam < 7) c = skor_malam;
+
+    int arr[3] = {a, b, c};
+    int prioritas = 0;
+    int min = 10000;
+
+    for (int i = 0; i < 3; i++){
+        if (arr[i] >= 0 && arr[i] < min){
+            min = arr[i];
+            prioritas = i+1;
+        }
+    }
+    // kasus jika ada skor negatif dan yang lain sudah penuh shift nya
+    if (prioritas == 0){
+        for (int i = 0; i < 3; i++){
+            if (arr[i] < min){
+                min = arr[i];
+                prioritas = -(i+1);
+            }
+        }
+    }
+
+    return prioritas;
+}
+
+void isi_jadwalPrioritas(Dokter daftar_dokter[100], Jadwal list_jadwal[7], int jumlah_dokter, int prioritas,
+                        int *hari_pagi, int *hari_siang, int *hari_malam, int idx, int *progress){
+    
+    if (prioritas == 1 && daftar_dokter[idx].pagi == 1){
+        isi_jadwal(daftar_dokter, list_jadwal, hari_pagi, idx, 1);
+        *progress = 1;
+    }
+    else if (prioritas == 2 && daftar_dokter[idx].siang == 1){
+        isi_jadwal(daftar_dokter, list_jadwal, hari_siang, idx, 2);
+        *progress = 1;
+    }
+    else if (prioritas == 3 && daftar_dokter[idx].malam == 1){
+        isi_jadwal(daftar_dokter, list_jadwal, hari_malam, idx, 3);
+        *progress = 1;
+    }
+}
+
+void reset_hari(int *hari_pagi, int *iterasi_pagi, int *hari_siang, int *iterasi_siang, int *hari_malam, int *iterasi_malam){
+    if (*hari_pagi == 7){
+        *hari_pagi = 0;
+        *iterasi_pagi += 1;
+    }
+    if (*hari_siang == 7){
+        *hari_siang = 0;
+        *iterasi_siang += 1;
+    }
+    if (*hari_malam == 7){
+        *hari_malam = 0;
+        *iterasi_malam += 1;
+    }
+}
+
+void assign_sisa(Dokter daftar_dokter[100], Jadwal list_jadwal[7], int idx, int *hari_pagi, int *iterasi_pagi,
+                int *hari_siang, int *iterasi_siang, int *hari_malam, int *iterasi_malam){
+    
+    int pref[3] = {daftar_dokter[idx].pagi, daftar_dokter[idx].siang, daftar_dokter[idx].malam};
+    int arr_iterasi[3] = {*iterasi_pagi, *iterasi_siang, *iterasi_malam};
+    int arr_hari[3] = {*hari_pagi, *hari_siang, *hari_malam};
+    int min_iterasi = 10;
+    int min_hari = 7;
+    int shift = 0;
+    
+    // cek iterasi minimum
+    for (int i = 0; i < 3; i++){
+        if (pref[i] == 1 && arr_iterasi[i] < min_iterasi){
+            min_iterasi = arr_iterasi[i];
+            min_hari = arr_hari[i];
+            shift = i+1;
+        }
+    }
+    // cek shift lain yang iterasi nya == iterasi minimum
+    for (int i = shift; i < 3; i++){
+        if (pref[i] == 1 && arr_iterasi[i] == min_iterasi){
+            if (arr_hari[i] < min_hari){
+                min_hari = arr_hari[i];
+                shift = i+1; 
+            }
+        }
+    }
+    // assign dokter ke shift terpilih
+    if (shift == 1) isi_jadwal(daftar_dokter, list_jadwal, hari_pagi, idx, 1);
+    else if (shift == 2) isi_jadwal(daftar_dokter, list_jadwal, hari_siang, idx, 2);
+    else if (shift == 3) isi_jadwal(daftar_dokter, list_jadwal, hari_malam, idx, 3);
+}
+
+void reset_jadwal(Jadwal list_jadwal[7]){
+    for (int i = 0; i < 7; i++){
+        free(list_jadwal[i].pagi);
+        free(list_jadwal[i].siang);
+        free(list_jadwal[i].malam);
+        list_jadwal[i].pagi = NULL;
+        list_jadwal[i].siang = NULL;
+        list_jadwal[i].malam = NULL;
+        list_jadwal[i].jumlah_pagi = 0;
+        list_jadwal[i].jumlah_siang = 0;
+        list_jadwal[i].jumlah_malam = 0;
+    }
+}
+
+void scheduling(Dokter daftar_dokter[100], int jumlah_dokter, Jadwal list_jadwal[7]){
+    // looping dokter
+    int hari_pagi = 0;
+    int hari_siang = 0;
+    int hari_malam = 0;
+    int indeks_dokter = 0;
+    int *arr_notAssigned = (int*) malloc(sizeof(int));
+    int *arr_notAssigned_1Pref = (int*) malloc(sizeof(int));
+    int notAssigned = 0;
+    int notAssigned_1Pref = 0;
+
+    // pengisian pertama mengutamakan dokter dengan 1 preferensi
+    while ((indeks_dokter < jumlah_dokter) && (hari_pagi < 7 || hari_siang < 7 || hari_malam < 7)){
+        switch (cek_1preferensi(daftar_dokter, indeks_dokter))
+        {
+        case 1:
+            if (hari_pagi < 7) isi_jadwal(daftar_dokter, list_jadwal, &hari_pagi, indeks_dokter, 1);
+            else{
+                notAssigned_1Pref++;
+                arr_notAssigned_1Pref = realloc(arr_notAssigned_1Pref, notAssigned_1Pref*sizeof(int));
+                arr_notAssigned_1Pref[notAssigned_1Pref-1] = daftar_dokter[indeks_dokter].id;
+            }
+            break;
+
+        case 2:
+            if (hari_siang < 7) isi_jadwal(daftar_dokter, list_jadwal, &hari_siang, indeks_dokter, 2);
+            else{
+                notAssigned_1Pref++;
+                arr_notAssigned_1Pref = realloc(arr_notAssigned_1Pref, notAssigned_1Pref*sizeof(int));
+                arr_notAssigned_1Pref[notAssigned_1Pref-1] = daftar_dokter[indeks_dokter].id;
+            }
+            break;
+
+        case 3:
+            if (hari_malam < 7) isi_jadwal(daftar_dokter, list_jadwal, &hari_malam, indeks_dokter, 3);
+            else{
+                notAssigned_1Pref++;
+                arr_notAssigned_1Pref = realloc(arr_notAssigned_1Pref, notAssigned_1Pref*sizeof(int));
+                arr_notAssigned_1Pref[notAssigned_1Pref-1] = daftar_dokter[indeks_dokter].id;
+            }
+            break;
+
+        default:
+            notAssigned++;
+            arr_notAssigned = realloc(arr_notAssigned, notAssigned*sizeof(int));
+            arr_notAssigned[notAssigned-1] = daftar_dokter[indeks_dokter].id;
+            break;
+        }
+        indeks_dokter++;
+    }
+    // keluar dari while ini bisa ada 3 kasus
+    // 1. perfect, dokter pas untuk 21 shift per minggu
+    // 2. belum semua shift terisi penuh
+    // 3. 21 shift terisi tetapi ada sisa dokter
+    
+    int lenght_notAssigned = sizeof(arr_notAssigned) / sizeof(int);
+    int lenght_notAssigned_1Pref = sizeof(arr_notAssigned_1Pref) / sizeof(int);
+    int progress = 1;
+    int done = 0;
+
+    // kasus 1
+    if (indeks_dokter == jumlah_dokter && lenght_notAssigned == 0 && lenght_notAssigned_1Pref == 0
+        && hari_pagi == 7 && hari_siang == 7 && hari_malam == 7){
+        return;
+    }
+
+    // kasus 2 (shift belum semuanya terisi)
+    while (hari_pagi < 7 || hari_siang < 7 || hari_malam < 7){
+        // jika ada dokter multi pref
+        if (lenght_notAssigned > 0 && done != 1){
+            progress = 0;
+            for (int i = 0; i < lenght_notAssigned; i++){
+                // cari indeks nya di list dokter
+                int idx = -1;
+                for (int j = 0; j < jumlah_dokter; j++){
+                    if (daftar_dokter[j].id == arr_notAssigned[i]){
+                        idx = j;
+                        break;
+                    }
+                }
+                if (daftar_dokter[idx].shift_assigned > 0) continue;
+
+                int prioritas = shift_prioritas(daftar_dokter, jumlah_dokter, hari_pagi, hari_siang, hari_malam);
+                isi_jadwalPrioritas(daftar_dokter, list_jadwal, jumlah_dokter, prioritas, &hari_pagi, &hari_siang, &hari_malam, idx, &progress);
+                if (hari_pagi == 7 && hari_siang == 7 && hari_malam == 7) break;
+            }
+            if (progress == 0) done = 1;
+        }
+
+        // isi shift kosong dengan melakukan loop ulang list dokter
+        // terjadi jika length_notAssigned == 0 atau done == 1
+        else{
+            progress = 0;
+            for (int idx = 0; idx < jumlah_dokter; idx++){
+                if (daftar_dokter[idx].shift_assigned >= daftar_dokter[idx].maks_shift) continue;
+
+                int prioritas = shift_prioritas(daftar_dokter, jumlah_dokter, hari_pagi, hari_siang, hari_malam);
+                isi_jadwalPrioritas(daftar_dokter, list_jadwal, jumlah_dokter, prioritas, &hari_pagi, &hari_siang, &hari_malam, idx, &progress);
+
+                // terpaksa pelanggaran
+                if (progress == 0){
+                    if (prioritas == -1){
+                        isi_jadwal(daftar_dokter, list_jadwal, &hari_pagi, idx, 1);
+                        progress = 1;
+                    }
+                    else if (prioritas == -2){
+                        isi_jadwal(daftar_dokter, list_jadwal, &hari_siang, idx, 2);
+                        progress = 1;
+                    }
+                    else if (prioritas == -3){
+                        isi_jadwal(daftar_dokter, list_jadwal, &hari_malam, idx, 3);
+                        progress = 1;
+                    }
+                }
+                if (hari_pagi == 7 && hari_siang == 7 && hari_malam == 7) break;
+            }
+            if (progress == 0) printf("Tidak ada lagi dokter yang dapat dipekerjakan"); break;
+        }
+    }
+
+    // kasus 3 (assign sisa dokter)
+    hari_pagi = hari_siang = hari_malam = 0;
+    int iterasi_pagi = 0; int iterasi_siang = 0; int iterasi_malam = 0;
+    // assign dokter 1 preferensi yang terlewat
+    for (int i = 0; i < lenght_notAssigned_1Pref; i++){
+        int idx = arr_notAssigned_1Pref[i];
+        int pref = cek_1preferensi(daftar_dokter, idx);
+        if (pref == 1) isi_jadwal(daftar_dokter, list_jadwal, &hari_pagi, idx, 1);
+        else if (pref == 2) isi_jadwal(daftar_dokter, list_jadwal, &hari_siang, idx, 2);
+        else if (pref == 3) isi_jadwal(daftar_dokter, list_jadwal, &hari_malam, idx, 3);
+
+        reset_hari(&hari_pagi, &iterasi_pagi, &hari_siang, &iterasi_siang, &hari_malam, &iterasi_malam);
+    }
+
+    // assign dokter 1 preferensi yang belum dijelajahi pada pengisian pertama
+    for (int idx = indeks_dokter; idx < jumlah_dokter; idx++){
+        int pref = cek_1preferensi(daftar_dokter, idx);
+        if (pref == 1) isi_jadwal(daftar_dokter, list_jadwal, &hari_pagi, idx, 1);
+        else if (pref == 2) isi_jadwal(daftar_dokter, list_jadwal, &hari_siang, idx, 2);
+        else if (pref == 3) isi_jadwal(daftar_dokter, list_jadwal, &hari_malam, idx, 3);
+
+        reset_hari(&hari_pagi, &iterasi_pagi, &hari_siang, &iterasi_siang, &hari_malam, &iterasi_malam);
+    }
+
+    // assign dokter multi pref yang di-skip pada pengisian pertama dan belum di-assign
+    for (int i = 0; i < lenght_notAssigned; i++){
+        int idx = arr_notAssigned[i];
+
+        if (daftar_dokter[arr_notAssigned[idx]].shift_assigned > 0) continue;
+        assign_sisa(daftar_dokter, list_jadwal, idx, &hari_pagi, &iterasi_pagi, &hari_siang, &iterasi_siang, &hari_malam, &iterasi_malam);
+    }
+
+    // assign dokter multi pref yang belum dijelajahi pada pengisian pertama
+    for (int idx = indeks_dokter; idx < jumlah_dokter; idx++){
+        if (daftar_dokter[idx].shift_assigned > 0) continue;
+        assign_sisa(daftar_dokter, list_jadwal, idx, &hari_pagi, &iterasi_pagi, &hari_siang, &iterasi_siang, &hari_malam, &iterasi_malam);
+    }
+    
+    // free
+    free(arr_notAssigned);
+    free(arr_notAssigned_1Pref);
+}
