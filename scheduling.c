@@ -327,12 +327,14 @@ void scheduling(Dokter daftar_dokter[100], int jumlah_dokter, Jadwal list_jadwal
 
         if (daftar_dokter[arr_notAssigned[idx]].shift_assigned > 0) continue;
         assign_sisa(daftar_dokter, list_jadwal, idx, &hari_pagi, &iterasi_pagi, &hari_siang, &iterasi_siang, &hari_malam, &iterasi_malam);
+        reset_hari(&hari_pagi, &iterasi_pagi, &hari_siang, &iterasi_siang, &hari_malam, &iterasi_malam);
     }
 
     // assign dokter multi pref yang belum dijelajahi pada pengisian pertama
     for (int idx = indeks_dokter; idx < jumlah_dokter; idx++){
         if (daftar_dokter[idx].shift_assigned > 0) continue;
         assign_sisa(daftar_dokter, list_jadwal, idx, &hari_pagi, &iterasi_pagi, &hari_siang, &iterasi_siang, &hari_malam, &iterasi_malam);
+        reset_hari(&hari_pagi, &iterasi_pagi, &hari_siang, &iterasi_siang, &hari_malam, &iterasi_malam);
     }
     
     // free
