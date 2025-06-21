@@ -22,13 +22,24 @@ int main() {
         return 1;
     }
 
-    // Tampilkan data
-    baca_dokter(dokter_list, jumlah_dokter);
-    baca_jadwal(jadwal_list, jumlah_jadwal);
+    printf("Pelanggaran untuk id 1, hari pertama:\n");
+    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, 1, 0, 0);
 
-    // Simpan ulang untuk uji write
-    dokter_to_csv("dokter_output.csv", dokter_list, jumlah_dokter);
-    jadwal_to_csv("jadwal_output.csv", jadwal_list, jumlah_jadwal);
+    printf("\n");
+    printf("Pelanggaran untuk id 1, seminggu:\n");
+    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, 1, 0, 1);
+
+    printf("\n");
+    printf("Pelanggaran untuk id 1, sebulan:\n");
+    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, 1, 0, 2);
+
+    printf("\n");
+    printf("Pelanggaran total, seminggu:\n");
+    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, 0, 0, 1);
+
+    printf("\n");
+    printf("Pelanggaran total, sebulan:\n");
+    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, 0, 0, 2);
 
     // Bebaskan memori dari alokasi array dinamis dalam Jadwal
     for (int i = 0; i < jumlah_jadwal; i++) {
