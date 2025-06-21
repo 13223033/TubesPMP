@@ -5,7 +5,7 @@
 
 #define MAX_DOKTER 100
 
-static int tambah_dokter(Dokter *list, int *jumlah,
+int tambah_dokter(Dokter *list, int *jumlah,
                          const char *nama, int maks_shift,
                          int pagi, int siang, int malam)
 {
@@ -26,7 +26,7 @@ static int tambah_dokter(Dokter *list, int *jumlah,
     return 1;
 }
 
-static int hapus_dokter(Dokter *list, int *jumlah, int id)
+int hapus_dokter(Dokter *list, int *jumlah, int id)
 {
     int idx = -1;
     for (int i = 0; i < *jumlah; ++i) {
@@ -41,11 +41,11 @@ static int hapus_dokter(Dokter *list, int *jumlah, int id)
     return 1;
 }
 
-static void tampilkan_dokter(const Dokter *list, int jumlah)
+void tampilkan_dokter(const Dokter *list, int jumlah)
 {
-    puts("\n===== DAFTAR DOKTER SAAT INI =====");
+    printf("\n===== DAFTAR DOKTER SAAT INI =====\n");
     print_dokter_list(list, jumlah);
-    puts("==================================");
+    printf("==================================\n");
 }
 
 void menu_pengelolaan_dokter(const char *nama_file)
@@ -56,20 +56,21 @@ void menu_pengelolaan_dokter(const char *nama_file)
 
     int pilih;
     do {
-        puts("\n=== MENU PENGELOLAAN DOKTER ===");
-        puts("1. Tampilkan daftar dokter");
-        puts("2. Tambah dokter");
-        puts("3. Hapus dokter");
-        puts("4. Kembali");
+        printf("\n=== MENU PENGELOLAAN DOKTER ===\n");
+        printf("1. Tampilkan daftar dokter\n");
+        printf("2. Tambah dokter\n");
+        printf("3. Hapus dokter\n");
+        printf("4. Kembali\n");
         printf("Pilihan: ");
         if (scanf("%d", &pilih) != 1) { fflush(stdin); pilih = 4; }
 
         if (pilih == 1) {
             tampilkan_dokter(dokter_list, jumlah_dokter);
+
         } else if (pilih == 2) {
             char nama[100];
             int maks, pg, sg, ml;
-            getchar();
+            getchar(); // flush newline
             printf("Nama          : "); fgets(nama, sizeof nama, stdin);
             nama[strcspn(nama, "\n")] = '\0';
             printf("Maks shift    : ");  scanf("%d", &maks);
@@ -80,22 +81,24 @@ void menu_pengelolaan_dokter(const char *nama_file)
             if (tambah_dokter(dokter_list, &jumlah_dokter,
                                nama, maks, pg, sg, ml)) {
                 dokter_to_csv(nama_file, dokter_list, jumlah_dokter);
-                puts(">> Dokter ditambahkan.");
+                printf(">> Dokter ditambahkan.\n");
             } else {
-                puts(">> Gagal menambahkan dokter (kapasitas penuh).");
+                printf(">> Gagal menambahkan dokter (kapasitas penuh).\n");
             }
+
         } else if (pilih == 3) {
             int id;
             printf("Masukkan ID dokter yang akan dihapus: ");
             scanf("%d", &id);
             if (hapus_dokter(dokter_list, &jumlah_dokter, id)) {
                 dokter_to_csv(nama_file, dokter_list, jumlah_dokter);
-                puts(">> Dokter berhasil dihapus.");
+                printf(">> Dokter berhasil dihapus.\n");
             } else {
-                puts(">> Dokter dengan ID tersebut tidak ditemukan.");
+                printf(">> Dokter dengan ID tersebut tidak ditemukan.\n");
             }
+
         } else if (pilih != 4) {
-            puts(">> Pilihan tidak valid.");
+            printf(">> Pilihan tidak valid.\n");
         }
 
     } while (pilih != 4);
