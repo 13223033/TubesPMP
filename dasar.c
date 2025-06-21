@@ -93,19 +93,25 @@ int csv_to_jadwal(const char *filename, Jadwal *jadwal_list, int max_jadwal) {
 
     while (fgets(line, sizeof(line), fp) && count < max_jadwal) {
         Jadwal *jadwal = &jadwal_list[count];
+
         char *token;
+        char *fields[6];
+        int i = 0;
 
-        token = strtok(line, ",");
-        jadwal->pagi = token ? parse_id_list(token, &jadwal->jumlah_pagi) : NULL;
+        token = strtok(line, ",\r\n");
+        while (token != NULL && i < 6) {
+            fields[i++] = token;
+            token = strtok(NULL, ",\r\n");
+        }
 
-        token = strtok(NULL, ",");
-        jadwal->siang = token ? parse_id_list(token, &jadwal->jumlah_siang) : NULL;
+        if (i < 6) {
+            fprintf(stderr, "Baris tidak lengkap: %s\n", line);
+            continue;
+        }
 
-        token = strtok(NULL, ",");
-        jadwal->malam = token ? parse_id_list(token, &jadwal->jumlah_malam) : NULL;
-
-        // Lewati jumlah_pagi, jumlah_siang, jumlah_malam
-        for (int i = 0; i < 3; i++) strtok(NULL, ",");
+        jadwal->pagi = parse_id_list(fields[0], &jadwal->jumlah_pagi);
+        jadwal->siang = parse_id_list(fields[1], &jadwal->jumlah_siang);
+        jadwal->malam = parse_id_list(fields[2], &jadwal->jumlah_malam);
 
         count++;
     }
@@ -113,6 +119,7 @@ int csv_to_jadwal(const char *filename, Jadwal *jadwal_list, int max_jadwal) {
     fclose(fp);
     return count;
 }
+
 
 void print_jadwal_list(const Jadwal *list, int jumlah) {
     for (int i = 0; i < jumlah; i++) {
@@ -168,15 +175,16 @@ void free_jadwal_list(Jadwal *jadwal_list, int jumlah) {
 // ------------ UTIL ------------
 
 int *parse_id_list(const char *str, int *jumlah) {
-    int *arr = malloc(20 * sizeof(int)); // kapasitas awal
+    int *arr = malloc(20 * sizeof(int));
     *jumlah = 0;
 
+    if (!str || strlen(str) == 0) return arr;
+
     char buffer[256];
-    strncpy(buffer, str, sizeof(buffer));
+    strncpy(buffer, str, sizeof(buffer) - 1);
     buffer[sizeof(buffer) - 1] = '\0';
 
     char *token = strtok(buffer, ";");
-
     while (token && *jumlah < 20) {
         arr[*jumlah] = atoi(token);
         (*jumlah)++;
@@ -185,6 +193,7 @@ int *parse_id_list(const char *str, int *jumlah) {
 
     return arr;
 }
+
 
 void join_id_list(char *buffer, const int *arr, int jumlah) {
     buffer[0] = '\0';
