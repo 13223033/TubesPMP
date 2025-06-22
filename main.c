@@ -24,26 +24,9 @@ int main() {
         return 1;
     }
 
-    int pilih;
-    do {
-        puts("\n=== MENU UTAMA ===");
-        puts("1. Tampilkan data");
-        puts("2. Pengelolaan dokter");
-        puts("0. Keluar");
-        printf("Pilihan: ");
-        scanf("%d", &pilih);
-
-        if (pilih == 1) {
-            baca_dokter(dokter_list, jumlah_dokter);
-            baca_jadwal(jadwal_list, jumlah_jadwal);
-        } else if (pilih == 2) {
-            menu_pengelolaan_dokter("data_dokter.csv");
-
-            // Baca ulang data dokter setelah perubahan
-            jumlah_dokter = csv_to_dokter("data_dokter.csv", dokter_list, MAX_DOKTER);
-        }
-
-    } while (pilih != 0);
+     // Tampilkan dataMore actions
+    baca_dokter(dokter_list, jumlah_dokter);
+    baca_jadwal(jadwal_list, jumlah_jadwal);
 
     // Simpan ulang untuk uji write
     dokter_to_csv("dokter_output.csv", dokter_list, jumlah_dokter);
