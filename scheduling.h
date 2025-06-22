@@ -17,6 +17,6 @@ void scheduling_stage2(Dokter daftar_dokter[], Jadwal list_jadwal[], int jumlah_
                     int *arr_notAssigned_1Pref, int notAssigned_1Pref, int *arr_notAssigned_multi, int notAssigned_multi);
 void scheduling_stage3(Dokter daftar_dokter[], Jadwal list_jadwal[], int jumlah_dokter, int indeks, int *hari_pagi, int *hari_siang, int *hari_malam);
 void scheduling_main(Dokter daftar_dokter[], int jumlah_dokter, Jadwal list_jadwal[]);
-void reset_jadwal(Jadwal list_jadwal[]);
+void reset_jadwal(Jadwal list_jadwal[], Dokter daftar_dokter[], int jumlah_dokter, int hapus_shift);
 
 #endif
