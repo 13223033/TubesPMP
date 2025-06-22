@@ -4,6 +4,7 @@
 #include "baca_file.h"
 #include "pelanggaran.h"
 #include "pengelolaan.h"
+#include "scheduling.h"
 
 
 #define MAX_DOKTER 100
@@ -16,28 +17,46 @@ int main() {
 
     // Baca data dari file CSV
     int jumlah_dokter = csv_to_dokter("data_dokter.csv", dokter_list, MAX_DOKTER);
-    int jumlah_jadwal = csv_to_jadwal("jadwal.csv", jadwal_list, MAX_JADWAL);
+    // int jumlah_jadwal = csv_to_jadwal("jadwal.csv", jadwal_list, MAX_JADWAL);
 
     // Validasi
-    if (jumlah_dokter < 0 || jumlah_jadwal < 0) {
+    if (jumlah_dokter < 0) {
         printf("Gagal membaca data dari file.\n");
         return 1;
     }
 
-     // Tampilkan dataMore actions
-    baca_dokter(dokter_list, jumlah_dokter);
-    baca_jadwal(jadwal_list, jumlah_jadwal);
+    int pilih;
+    do {
+        puts("\n=== MENU UTAMA ===");
+        puts("1. Tampilkan data");
+        puts("2. Pengelolaan dokter");
+        puts("3. Buat jadwal");
+        puts("0. Keluar");
+        printf("Pilihan: ");
+        scanf("%d", &pilih);
+
+        if (pilih == 1) {
+            baca_dokter(dokter_list, jumlah_dokter);
+            baca_jadwal(jadwal_list, 7);
+        } else if (pilih == 2) {
+            menu_pengelolaan_dokter("data_dokter.csv");
+
+            // Baca ulang data dokter setelah perubahan
+            jumlah_dokter = csv_to_dokter("data_dokter.csv", dokter_list, MAX_DOKTER);
+        }
+        else if (pilih == 3){
+            reset_jadwal(jadwal_list, dokter_list, jumlah_dokter, 1);
+            scheduling_main(dokter_list, jumlah_dokter, jadwal_list);
+        }
+
+    } while (pilih != 0);
 
     // Simpan ulang untuk uji write
     dokter_to_csv("dokter_output.csv", dokter_list, jumlah_dokter);
-    jadwal_to_csv("jadwal_output.csv", jadwal_list, jumlah_jadwal);
+    jadwal_to_csv("jadwal_output.csv", jadwal_list, 7);
 
     // Bebaskan memori dari alokasi array dinamis dalam Jadwal
-    for (int i = 0; i < jumlah_jadwal; i++) {
-        free(jadwal_list[i].pagi);
-        free(jadwal_list[i].siang);
-        free(jadwal_list[i].malam);
-    }
+    reset_jadwal(jadwal_list, dokter_list, jumlah_dokter, 0);
 
     return 0;
 }
