@@ -346,7 +346,6 @@ void scheduling_main(Dokter daftar_dokter[], int jumlah_dokter, Jadwal list_jadw
     // pengisian pertama mengutamakan dokter dengan 1 preferensi
     scheduling_stage1(daftar_dokter, list_jadwal, &indeks_dokter, jumlah_dokter, &hari_pagi, &hari_siang, &hari_malam,
                     &arr_notAssigned_1Pref, &notAssigned_1Pref, &arr_notAssigned_multi, &notAssigned_multi);
-    printf("Stage 1 selesai\n");
     // keluar dari stage 1 bisa ada 3 kasus
     // 1. perfect, dokter pas untuk 21 shift per minggu
     // 2. belum semua shift terisi penuh
@@ -355,7 +354,6 @@ void scheduling_main(Dokter daftar_dokter[], int jumlah_dokter, Jadwal list_jadw
     // kasus 1
     if (indeks_dokter == jumlah_dokter && notAssigned_multi == 0 && notAssigned_1Pref == 0
         && hari_pagi == 7 && hari_siang == 7 && hari_malam == 7){
-        printf("Kasus 1\n");
         return;
     }
 
