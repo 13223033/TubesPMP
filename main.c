@@ -5,6 +5,7 @@
 #include "pelanggaran.h"
 #include "pengelolaan.h"
 #include "scheduling.h"
+#include "tampilkanJadwal.h"
 
 
 #define MAX_DOKTER 100
@@ -13,11 +14,13 @@
 int main() {
     // Array dokter dan jadwal
     Dokter dokter_list[MAX_DOKTER];
-    Jadwal jadwal_list[MAX_JADWAL];
+    Jadwal jadwal_list[MAX_JADWAL] = {0};
 
     // Baca data dari file CSV
     int jumlah_dokter = csv_to_dokter("data_dokter.csv", dokter_list, MAX_DOKTER);
     // int jumlah_jadwal = csv_to_jadwal("jadwal.csv", jadwal_list, MAX_JADWAL);
+
+    int jadwal_created = 0;
 
     // Validasi
     if (jumlah_dokter < 0) {
@@ -28,7 +31,7 @@ int main() {
     int pilih;
     do {
         puts("\n=== MENU UTAMA ===");
-        puts("1. Tampilkan data");
+        puts("1. Tampilkan jadwal");
         puts("2. Pengelolaan dokter");
         puts("3. Buat jadwal");
         puts("0. Keluar");
@@ -36,8 +39,11 @@ int main() {
         scanf("%d", &pilih);
 
         if (pilih == 1) {
-            baca_dokter(dokter_list, jumlah_dokter);
-            baca_jadwal(jadwal_list, 7);
+            if (!jadwal_created) {
+                printf("Jadwal belum dibuat! Silakan pilih opsi 3 untuk membuat jadwal terlebih dahulu.\n");
+            } else {
+                menu_tampilkan_jadwal(dokter_list, jumlah_dokter, jadwal_list);
+            }
         } else if (pilih == 2) {
             menu_pengelolaan_dokter("data_dokter.csv");
 
@@ -47,6 +53,9 @@ int main() {
         else if (pilih == 3){
             reset_jadwal(jadwal_list, dokter_list, jumlah_dokter, 1);
             scheduling_main(dokter_list, jumlah_dokter, jadwal_list);
+
+            jadwal_created = 1;
+            printf("Jadwal berhasil dibuat!\n");
         }
 
     } while (pilih != 0);
