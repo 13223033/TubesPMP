@@ -54,7 +54,7 @@ void tampilkan_jadwal_mingguan(const Dokter *dokter_list, int jumlah_dokter, con
             int id = jadwal_list[hari].pagi[i];
             for (int j = 0; j < jumlah_dokter; j++) {
                 if (dokter_list[j].id == id) {
-                    printf("%s, ", dokter_list[j].nama);
+                    printf("%s ", dokter_list[j].nama);
                     break;
                 }
             }
@@ -65,7 +65,7 @@ void tampilkan_jadwal_mingguan(const Dokter *dokter_list, int jumlah_dokter, con
             int id = jadwal_list[hari].siang[i];
             for (int j = 0; j < jumlah_dokter; j++) {
                 if (dokter_list[j].id == id) {
-                    printf("%s, ", dokter_list[j].nama);
+                    printf("%s ", dokter_list[j].nama);
                     break;
                 }
             }
@@ -76,7 +76,7 @@ void tampilkan_jadwal_mingguan(const Dokter *dokter_list, int jumlah_dokter, con
             int id = jadwal_list[hari].malam[i];
             for (int j = 0; j < jumlah_dokter; j++) {
                 if (dokter_list[j].id == id) {
-                    printf("%s, ", dokter_list[j].nama);
+                    printf("%s ", dokter_list[j].nama);
                     break;
                 }
             }
@@ -90,6 +90,45 @@ void tampilkan_jadwal_bulanan(const Dokter *dokter_list, int jumlah_dokter, cons
     for (int minggu = 0; minggu < 4; minggu++) {
         printf("\nMINGGU KE-%d\n", minggu + 1);
         tampilkan_jadwal_mingguan(dokter_list, jumlah_dokter, jadwal_list);
+    }
+    printf("\nMINGGU KE-5\n");
+
+    for (int hari = 0; hari < 2; hari++) {
+        printf("\n=== %s ===\n", nama_hari[hari]);
+
+        printf("Pagi: ");
+        for (int i = 0; i < jadwal_list[hari].jumlah_pagi; i++) {
+            int id = jadwal_list[hari].pagi[i];
+            for (int j = 0; j < jumlah_dokter; j++) {
+                if (dokter_list[j].id == id) {
+                    printf("%s ", dokter_list[j].nama);
+                    break;
+                }
+            }
+        }
+
+        printf("\nSiang: ");
+        for (int i = 0; i < jadwal_list[hari].jumlah_siang; i++) {
+            int id = jadwal_list[hari].siang[i];
+            for (int j = 0; j < jumlah_dokter; j++) {
+                if (dokter_list[j].id == id) {
+                    printf("%s ", dokter_list[j].nama);
+                    break;
+                }
+            }
+        }
+
+        printf("\nMalam: ");
+        for (int i = 0; i < jadwal_list[hari].jumlah_malam; i++) {
+            int id = jadwal_list[hari].malam[i];
+            for (int j = 0; j < jumlah_dokter; j++) {
+                if (dokter_list[j].id == id) {
+                    printf("%s ", dokter_list[j].nama);
+                    break;
+                }
+            }
+        }
+        printf("\n");
     }
 }
 
@@ -153,7 +192,7 @@ void menu_tampilkan_jadwal(const Dokter *dokter_list, int jumlah_dokter, const J
         printf("2. Tampilkan jadwal mingguan\n");
         printf("3. Tampilkan jadwal bulanan\n");
         printf("4. Tampilkan jadwal dokter\n");
-        printf("5. Kembali\n");
+        printf("0. Kembali\n");
         printf("Pilihan: ");
         scanf("%d", &pilih);
 
@@ -179,8 +218,8 @@ void menu_tampilkan_jadwal(const Dokter *dokter_list, int jumlah_dokter, const J
             printf("Masukkan ID dokter: ");
             scanf("%d", &id);
             tampilkan_jadwal_dokter(dokter_list, jumlah_dokter, jadwal_list, id);
-        } else if (pilih != 5) {
+        } else if (pilih != 0) {
             printf("Pilihan tidak valid!\n");
         }
-    } while (pilih != 5);
+    } while (pilih != 0);
 }
