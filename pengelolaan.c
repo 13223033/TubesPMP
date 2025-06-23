@@ -66,7 +66,7 @@ void menu_pengelolaan_dokter(const char *nama_file)
 
         if (pilih == 1) {
             tampilkan_dokter(dokter_list, jumlah_dokter);
-
+            konfirmasi();
         } else if (pilih == 2) {
             char nama[100];
             int maks, pg, sg, ml;
@@ -84,6 +84,7 @@ void menu_pengelolaan_dokter(const char *nama_file)
                 printf(">> Dokter ditambahkan.\n");
             } else {
                 printf(">> Gagal menambahkan dokter (kapasitas penuh).\n");
+                konfirmasi();
             }
 
         } else if (pilih == 3) {
@@ -95,9 +96,12 @@ void menu_pengelolaan_dokter(const char *nama_file)
                 printf(">> Dokter berhasil dihapus.\n");
             } else {
                 printf(">> Dokter dengan ID tersebut tidak ditemukan.\n");
+                konfirmasi();
             }
 
-        } else if (pilih != 4) {
+        } else if (pilih == 4) {
+            printf("Kembali ke menu utama...\n");
+        } else {
             printf(">> Pilihan tidak valid.\n");
         }
 
