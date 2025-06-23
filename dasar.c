@@ -205,3 +205,10 @@ void join_id_list(char *buffer, const int *arr, int jumlah) {
             strcat(buffer, ";");
     }
 }
+
+void konfirmasi (void) {
+     // Tunggu input Enter sebelum melanjutkan
+    printf("Tekan Enter untuk kembali ke menu sebelumnya...");
+    while (getchar() != '\n'); // flush input buffer
+    getchar();
+}

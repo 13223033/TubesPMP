@@ -209,17 +209,28 @@ void menu_tampilkan_jadwal(const Dokter *dokter_list, int jumlah_dokter, const J
             } else {
                 printf("Pilihan tidak valid!\n");
             }
+
+            konfirmasi();
         } else if (pilih == 2) {
             tampilkan_jadwal_mingguan(dokter_list, jumlah_dokter, jadwal_list);
+
+            konfirmasi();
         } else if (pilih == 3) {
             tampilkan_jadwal_bulanan(dokter_list, jumlah_dokter, jadwal_list);
+
+            konfirmasi();
         } else if (pilih == 4) {
             int id;
             printf("Masukkan ID dokter: ");
             scanf("%d", &id);
             tampilkan_jadwal_dokter(dokter_list, jumlah_dokter, jadwal_list, id);
-        } else if (pilih != 0) {
+            konfirmasi();
+        } else if (pilih == 0) {
+            printf("Kembali ke menu utama...\n");
+        } else {
             printf("Pilihan tidak valid!\n");
+            konfirmasi();
         }
+        
     } while (pilih != 0);
 }
