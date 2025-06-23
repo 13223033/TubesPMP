@@ -19,23 +19,29 @@ int FindIdx(Dokter dokter_list[], int id, int jumlah_dokter) {
 // Harian
 void PelanggaranDokterHarian(Dokter dokter, Jadwal jadwal, int *totalpelanggaran) {
     // pelanggaran pagi
-    for (int i = 0; i < jadwal.jumlah_pagi; i++) {
-        if (jadwal.pagi[i] == dokter.id) {
-            (*totalpelanggaran)++;
+    if (!dokter.pagi) {
+        for (int i = 0; i < jadwal.jumlah_pagi; i++) {
+            if (jadwal.pagi[i] == dokter.id) {
+                (*totalpelanggaran)++;
+            }
         }
     }
 
     // pelanggaran siang
-    for (int i = 0; i < jadwal.jumlah_siang; i++) {
-        if (jadwal.siang[i] == dokter.id) {
-            (*totalpelanggaran)++;
+    if (!dokter.siang) {
+        for (int i = 0; i < jadwal.jumlah_siang; i++) {
+            if (jadwal.siang[i] == dokter.id) {
+                (*totalpelanggaran)++;
+            }
         }
     }
 
     // pelanggaran malam
-    for (int i = 0; i < jadwal.jumlah_malam; i++) {
-        if (jadwal.malam[i] == dokter.id) {
-            (*totalpelanggaran)++;
+    if (!dokter.malam) {
+        for (int i = 0; i < jadwal.jumlah_malam; i++) {
+            if (jadwal.malam[i] == dokter.id) {
+                (*totalpelanggaran)++;
+            }
         }
     }
 }
