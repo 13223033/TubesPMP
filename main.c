@@ -8,12 +8,11 @@
 #include "tampilkanJadwal.h"
 
 #define MAX_DOKTER 100
-#define MAX_JADWAL 31  // Anggap maksimal 31 hari
 
 int main() {
     // Array dokter dan jadwal
     Dokter dokter_list[MAX_DOKTER];
-    Jadwal jadwal_list[MAX_JADWAL] = {0};
+    Jadwal jadwal_list[7] = {0};
 
     // Baca data dari file CSV
     int jumlah_dokter = csv_to_dokter("data_dokter.csv", dokter_list, MAX_DOKTER);
@@ -68,11 +67,9 @@ int main() {
                 printf("Pilihan: ");
                 scanf("%d", &opsi_pelanggaran);
 
-                if (opsi_pelanggaran == 1 || opsi_pelanggaran == 2){
-                    if (opsi_pelanggaran == 1){
-                        printf("\nMasukkan id dokter: ");
-                        scanf("%d", &id);
-                    }
+                if (opsi_pelanggaran == 1){
+                    printf("\nMasukkan id dokter: ");
+                    scanf("%d", &id);
 
                     printf("\nPelanggaran untuk id %d, hari pertama:\n", id);
                     PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, id, 0, 0);
@@ -84,14 +81,15 @@ int main() {
                     printf("\n");
                     printf("Pelanggaran untuk id %d, sebulan:\n", id);
                     PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, id, 0, 2);
-
+                }
+                else if (opsi_pelanggaran == 2){
                     printf("\n");
                     printf("Pelanggaran total, seminggu:\n", id);
-                    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, id, 0, 1);
+                    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, 0, 0, 1);
 
                     printf("\n");
                     printf("Pelanggaran total, sebulan:\n", id);
-                    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, id, 0, 2);
+                    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, 0, 0, 2);
                 }
             }
         }
