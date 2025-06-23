@@ -33,6 +33,7 @@ int main() {
         puts("1. Tampilkan jadwal");
         puts("2. Pengelolaan dokter");
         puts("3. Buat jadwal");
+        puts("4. Cek pelanggaran");
         puts("0. Keluar");
         printf("Pilihan: ");
         scanf("%d", &pilih);
@@ -55,6 +56,44 @@ int main() {
 
             jadwal_created = 1;
             printf("Jadwal berhasil dibuat!\n");
+        }
+        else if (pilih == 4){
+            if (!jadwal_created) {
+                printf("Jadwal belum dibuat! Silakan pilih opsi 3 untuk membuat jadwal terlebih dahulu.\n");
+            } else {
+                int id = 0; int opsi_pelanggaran;
+                puts("\n=== MENU CEK PELANGGARAN ===");
+                puts("1. Lihat pelanggaran dokter tertentu");
+                puts("2. Lihat total pelanggaran semua dokter");
+                printf("Pilihan: ");
+                scanf("%d", &opsi_pelanggaran);
+
+                if (opsi_pelanggaran == 1 || opsi_pelanggaran == 2){
+                    if (opsi_pelanggaran == 1){
+                        printf("\nMasukkan id dokter: ");
+                        scanf("%d", &id);
+                    }
+
+                    printf("\nPelanggaran untuk id %d, hari pertama:\n", id);
+                    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, id, 0, 0);
+
+                    printf("\n");
+                    printf("Pelanggaran untuk id %d, seminggu:\n", id);
+                    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, id, 0, 1);
+
+                    printf("\n");
+                    printf("Pelanggaran untuk id %d, sebulan:\n", id);
+                    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, id, 0, 2);
+
+                    printf("\n");
+                    printf("Pelanggaran total, seminggu:\n", id);
+                    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, id, 0, 1);
+
+                    printf("\n");
+                    printf("Pelanggaran total, sebulan:\n", id);
+                    PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, id, 0, 2);
+                }
+            }
         }
 
     } while (pilih != 0);

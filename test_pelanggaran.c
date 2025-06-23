@@ -14,7 +14,7 @@ int main() {
 
     // Baca data dari file CSV
     int jumlah_dokter = csv_to_dokter("data_dokter.csv", dokter_list, MAX_DOKTER);
-    int jumlah_jadwal = csv_to_jadwal("jadwal.csv", jadwal_list, MAX_JADWAL);
+    int jumlah_jadwal = csv_to_jadwal("jadwal_output.csv", jadwal_list, 7);
 
     // Validasi
     if (jumlah_dokter < 0 || jumlah_jadwal < 0) {
