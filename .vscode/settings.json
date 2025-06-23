@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "dasar.h": "c"
+        "dasar.h": "c",
+        "scheduling.h": "c",
+        "scheduling_ver2.h": "c"
     }
 }

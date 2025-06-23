@@ -85,9 +85,6 @@ int shift_prioritas(Dokter daftar_dokter[], int jumlah_dokter, int hari_pagi, in
     if (hari_pagi < 7) a = skor_pagi;
     if (hari_siang < 7) b = skor_siang;
     if (hari_malam < 7) c = skor_malam;
-    printf("pagi_kosong, siang_kosong, malam_kosong: %d, %d, %d\n", pagi_kosong, siang_kosong, malam_kosong);
-    printf("avail_pagi, avail_siang, avail_malam: %d, %d, %d\n", available_pagi, available_siang, available_malam);
-    printf("skor_pagi, skor_siang, skor_malam: %d, %d, %d\n", a, b, c);
 
     int arr[3] = {a, b, c};
     int prioritas = 0;
@@ -203,16 +200,14 @@ void scheduling_stage1(Dokter daftar_dokter[], Jadwal list_jadwal[], int *indeks
         }
         *indeks_dokter += 1;
     }
-    printf("hari_pagi, hari_siang, hari_malam : %d, %d, %d\n", *hari_pagi, *hari_siang, *hari_malam);
-    printf("notAssigned_1Pref, notAssigned_multi : %d, %d\n", *notAssigned_1Pref, *notAssigned_multi);
 }
 
 void scheduling_stage2(Dokter daftar_dokter[], Jadwal list_jadwal[], int jumlah_dokter, int *hari_pagi, int *hari_siang, int *hari_malam,
                     int *arr_notAssigned_1Pref, int notAssigned_1Pref, int *arr_notAssigned_multi, int notAssigned_multi){
     
     int progress = 0; int done = 0; int available = 0; int pelanggaran = 0; int count = 0;
+    int prioritas = 0; int idx_min = 0; int masuk_loop_ulang = 0;
     while (*hari_pagi < 7 || *hari_siang < 7 || *hari_malam < 7){
-        printf("Masuk stage 2\n");
         // jika ada dokter multi pref
         if (notAssigned_multi > 0 && done != 1){
             available = 0; int tidak_bersedia = 0;
@@ -220,11 +215,10 @@ void scheduling_stage2(Dokter daftar_dokter[], Jadwal list_jadwal[], int jumlah_
                 progress = 0;
                 // cari indeks nya di list dokter
                 int idx = FindIdx(daftar_dokter, arr_notAssigned_multi[i], jumlah_dokter);
-                // printf("indeks : %d\n", idx);
                 if (daftar_dokter[idx].shift_assigned > 0) continue;
                 
                 available += 1;
-                int prioritas = shift_prioritas(daftar_dokter, jumlah_dokter, *hari_pagi, *hari_siang, *hari_malam);
+                prioritas = shift_prioritas(daftar_dokter, jumlah_dokter, *hari_pagi, *hari_siang, *hari_malam);
                 isi_jadwalPrioritas(daftar_dokter, list_jadwal, jumlah_dokter, prioritas, hari_pagi, hari_siang, hari_malam, idx, &progress, 0);
                 if ((*hari_pagi) == 7 && (*hari_siang) == 7 && (*hari_malam) == 7) break;
                 if (prioritas < 0){ // tidak tersedia dokter yang sesuai preferensinya
@@ -232,31 +226,41 @@ void scheduling_stage2(Dokter daftar_dokter[], Jadwal list_jadwal[], int jumlah_
                     break;
                 }
                 if (progress == 0) tidak_bersedia += 1;
-                // printf("Prioritas, Progress: %d, %d\n", prioritas, progress);
-                // printf("available, tidak_bersedia: %d, %d\n", available, tidak_bersedia);
-                // printf("hari_pagi, hari_siang, hari_malam : %d, %d, %d\n\n", *hari_pagi, *hari_siang, *hari_malam);
-
             }
             if (available == tidak_bersedia) done = 1; // dokter notAssigned_multi tidak ada yang sesuai preferensi nya
         }
         // isi shift kosong dengan melakukan loop ulang list dokter.
         else if (notAssigned_multi == 0 || done == 1){
-            printf("Stage 2 ke 2\n");
-            progress = 0;
+            progress = 0; int min = 100; idx_min = 0; masuk_loop_ulang = 1;
             for (int idx = 0; idx < jumlah_dokter; idx++){
                 if (daftar_dokter[idx].shift_assigned >= daftar_dokter[idx].maks_shift) continue;
                 
-                printf("id = %d\n", idx+1);
                 available += 1;
-                int prioritas = shift_prioritas(daftar_dokter, jumlah_dokter, *hari_pagi, *hari_siang, *hari_malam);
-                isi_jadwalPrioritas(daftar_dokter, list_jadwal, jumlah_dokter, prioritas, hari_pagi, hari_siang, hari_malam, idx, &progress, 0);
-                if (*hari_pagi == 7 && *hari_siang == 7 && *hari_malam == 7) break;
-                if (prioritas < 0){
-                    pelanggaran = 1;
-                    break; // tidak tersedia dokter yang sesuai preferensinya 
+                prioritas = shift_prioritas(daftar_dokter, jumlah_dokter, *hari_pagi, *hari_siang, *hari_malam);
+                if (prioritas == SHIFT_PAGI && daftar_dokter[idx].pagi == 1){
+                    if (daftar_dokter[idx].shift_assigned < min){
+                        min = daftar_dokter[idx].shift_assigned;
+                        idx_min = idx;
+                    }
                 }
-                printf("Prioritas, Progress: %d, %d\n", prioritas, progress);
-                printf("hari_pagi, hari_siang, hari_malam : %d, %d, %d\n\n", *hari_pagi, *hari_siang, *hari_malam);
+                else if (prioritas == SHIFT_SIANG && daftar_dokter[idx].siang == 1){
+                    if (daftar_dokter[idx].shift_assigned < min){
+                        min = daftar_dokter[idx].shift_assigned;
+                        idx_min = idx;
+                    }
+                }
+                else if (prioritas == SHIFT_MALAM && daftar_dokter[idx].malam == 1){
+                    if (daftar_dokter[idx].shift_assigned < min){
+                        min = daftar_dokter[idx].shift_assigned;
+                        idx_min = idx;
+                    }
+                }
+            }   
+            isi_jadwalPrioritas(daftar_dokter, list_jadwal, jumlah_dokter, prioritas, hari_pagi, hari_siang, hari_malam, idx_min, &progress, 0);
+            if (*hari_pagi == 7 && *hari_siang == 7 && *hari_malam == 7) break;
+            if (prioritas < 0){
+                pelanggaran = 1;
+                break; // tidak tersedia dokter yang sesuai preferensinya 
             }
         }
         // terpaksa pelanggaran
@@ -278,20 +282,17 @@ void scheduling_stage2(Dokter daftar_dokter[], Jadwal list_jadwal[], int jumlah_
             count += 1;
         }
         // semua dokter sudah bekerja pada beban maksimum, cegah infinite loop
-        if ((available == 0) && (notAssigned_multi == 0 || done == 1)){
+        if ((available == 0) && (notAssigned_multi == 0 || done == 1) && masuk_loop_ulang == 1){
             printf("Tidak ada lagi dokter yang dapat dipekerjakan");
             break;
         }
-        
     }
-    printf("Stage 2 selesai\n");
 }
 
 void scheduling_stage3(Dokter daftar_dokter[], Jadwal list_jadwal[], int jumlah_dokter, int indeks, int *hari_pagi, int *hari_siang, int *hari_malam){
     
     *hari_pagi = *hari_siang = *hari_malam = 0;
     int iterasi_pagi = 0; int iterasi_siang = 0; int iterasi_malam = 0;
-    printf("Masuk stage 3\n");
     
     // assign dokter 1 preferensi yang belum di-assign
     for (int idx = 0; idx < jumlah_dokter; idx++){
@@ -303,14 +304,13 @@ void scheduling_stage3(Dokter daftar_dokter[], Jadwal list_jadwal[], int jumlah_
 
         reset_hari(hari_pagi, &iterasi_pagi, hari_siang, &iterasi_siang, hari_malam, &iterasi_malam);
     }
-
+    
     // assign dokter multi pref yang belum di-assign
     for (int idx = 0; idx < jumlah_dokter; idx++){
         if (daftar_dokter[idx].shift_assigned > 0) continue;
         assign_sisa(daftar_dokter, list_jadwal, idx, hari_pagi, &iterasi_pagi, hari_siang, &iterasi_siang, hari_malam, &iterasi_malam);
         reset_hari(hari_pagi, &iterasi_pagi, hari_siang, &iterasi_siang, hari_malam, &iterasi_malam);
     }
-    printf("Stage 3 selesai\n");
 }
 
 void reset_jadwal(Jadwal list_jadwal[], Dokter daftar_dokter[], int jumlah_dokter, int hapus_shift){

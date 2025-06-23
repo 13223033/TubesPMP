@@ -1,0 +1,7 @@
+id,nama,maks_shift,pagi,siang,malam,shift_assigned
+1,Ani,4,1,0,0,0
+2,Budi,5,0,1,0,0
+3,Cici,6,0,0,1,0
+4,Dedi,3,1,1,0,0
+5,Eka,5,0,1,1,0
+6,Fani,4,1,0,1,0

@@ -1,0 +1,9 @@
+id,nama,maks_shift,pagi,siang,malam,shift_assigned
+1,Ana,6,1,0,0,3
+2,Ben,5,1,1,0,3
+3,Cin,4,0,1,1,3
+4,Din,5,0,0,1,2
+5,Edo,3,1,0,1,3
+6,Fio,4,1,1,1,3
+7,Gia,5,0,1,0,2
+8,Han,6,1,0,0,2

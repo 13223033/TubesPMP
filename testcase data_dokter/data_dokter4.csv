@@ -1,0 +1,11 @@
+id,nama,maks_shift,pagi,siang,malam,shift_assigned
+1,Ari,6,1,0,0,0
+2,Beb,5,0,1,0,0
+3,Cup,4,0,0,1,0
+4,Dap,6,1,1,0,0
+5,Epa,5,1,0,1,0
+6,Fem,3,1,1,1,0
+7,Gop,4,0,1,1,0
+8,Hal,6,1,1,1,0
+9,Ina,5,1,0,0,0
+10,Jan,4,0,0,1,0

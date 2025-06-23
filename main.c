@@ -6,7 +6,6 @@
 #include "pengelolaan.h"
 #include "scheduling.h"
 
-
 #define MAX_DOKTER 100
 #define MAX_JADWAL 31  // Anggap maksimal 31 hari
 
