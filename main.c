@@ -8,12 +8,11 @@
 #include "tampilkanJadwal.h"
 
 #define MAX_DOKTER 100
-#define MAX_JADWAL 31  // Anggap maksimal 31 hari
 
 int main() {
     // Array dokter dan jadwal
     Dokter dokter_list[MAX_DOKTER];
-    Jadwal jadwal_list[MAX_JADWAL] = {0};
+    Jadwal jadwal_list[7] = {0};
 
     // Baca data dari file CSV
     int jumlah_dokter = csv_to_dokter("data_dokter.csv", dokter_list, MAX_DOKTER);
