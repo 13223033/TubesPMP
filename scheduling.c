@@ -283,7 +283,7 @@ void scheduling_stage2(Dokter dokter[], Jadwal jadwal[], int jumlah_dokter, int 
         }
         // semua dokter sudah bekerja pada beban maksimum, cegah infinite loop
         if ((available == 0) && (notAssigned_multi == 0 || done == 1) && masuk_loop_ulang == 1){
-            printf("Tidak ada lagi dokter yang dapat dipekerjakan");
+            printf("Tidak ada lagi dokter yang dapat dipekerjakan\n");
             break;
         }
     }

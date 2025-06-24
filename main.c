@@ -54,6 +54,9 @@ int main() {
             reset_jadwal(jadwal_list, dokter_list, jumlah_dokter, 1);
             scheduling_main(dokter_list, jumlah_dokter, jadwal_list);
 
+            jadwal_to_csv("jadwal.csv", jadwal_list, 7);
+            dokter_to_csv("data_dokter.csv", dokter_list, jumlah_dokter);
+
             jadwal_created = 1;
             printf("Jadwal berhasil dibuat!\n");
             konfirmasi();
