@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "tampilkanJadwal.h"
+#include "pelanggaran.h"
 #include "dasar.h"
 
 const char* nama_hari[] = {"Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"};
 
-void tampilkan_jadwal_harian(const Dokter *dokter_list, int jumlah_dokter, const Jadwal *jadwal_list, int hari) {
+void tampilkan_jadwal_harian(Dokter *dokter_list, int jumlah_dokter, Jadwal *jadwal_list, int hari) {
     if (hari < 0 || hari >= 7) {
         printf("Hari tidak valid!\n");
         return;
@@ -46,7 +47,7 @@ void tampilkan_jadwal_harian(const Dokter *dokter_list, int jumlah_dokter, const
     }
 }
 
-void tampilkan_jadwal_mingguan(const Dokter *dokter_list, int jumlah_dokter, const Jadwal *jadwal_list) {
+void tampilkan_jadwal_mingguan(Dokter *dokter_list, int jumlah_dokter, Jadwal *jadwal_list) {
     for (int hari = 0; hari < 7; hari++) {
         printf("\n=== %s ===\n", nama_hari[hari]);
         printf("Pagi: ");
@@ -85,7 +86,7 @@ void tampilkan_jadwal_mingguan(const Dokter *dokter_list, int jumlah_dokter, con
     }
 }
 
-void tampilkan_jadwal_bulanan(const Dokter *dokter_list, int jumlah_dokter, const Jadwal *jadwal_list) {
+void tampilkan_jadwal_bulanan(Dokter *dokter_list, int jumlah_dokter, Jadwal *jadwal_list) {
     printf("\n=== JADWAL BULANAN ===\n");
     for (int minggu = 0; minggu < 4; minggu++) {
         printf("\nMINGGU KE-%d\n", minggu + 1);
@@ -132,7 +133,7 @@ void tampilkan_jadwal_bulanan(const Dokter *dokter_list, int jumlah_dokter, cons
     }
 }
 
-void tampilkan_jadwal_dokter(const Dokter *dokter_list, int jumlah_dokter, const Jadwal *jadwal_list, int id_dokter) {
+void tampilkan_jadwal_dokter(Dokter *dokter_list, int jumlah_dokter, Jadwal *jadwal_list, int id_dokter) {
     int idx = -1;
     for (int i = 0; i < jumlah_dokter; i++) {
         if (dokter_list[i].id == id_dokter) {
@@ -184,7 +185,7 @@ void tampilkan_jadwal_dokter(const Dokter *dokter_list, int jumlah_dokter, const
     }
 }
 
-void menu_tampilkan_jadwal(const Dokter *dokter_list, int jumlah_dokter, const Jadwal *jadwal_list) {
+void menu_tampilkan_jadwal(Dokter *dokter_list, int jumlah_dokter, Jadwal *jadwal_list) {
     int pilih;
     do {
         printf("\n=== MENU TAMPILKAN JADWAL ===\n");
@@ -206,6 +207,9 @@ void menu_tampilkan_jadwal(const Dokter *dokter_list, int jumlah_dokter, const J
             scanf("%d", &hari);
             if (hari >= 1 && hari <= 7) {
                 tampilkan_jadwal_harian(dokter_list, jumlah_dokter, jadwal_list, hari-1);
+                // informasi pelanggaran
+                printf("\n[Pelanggaran] ");
+                PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, 0, hari-1, 0);
             } else {
                 printf("Pilihan tidak valid!\n");
             }
@@ -213,10 +217,17 @@ void menu_tampilkan_jadwal(const Dokter *dokter_list, int jumlah_dokter, const J
             konfirmasi();
         } else if (pilih == 2) {
             tampilkan_jadwal_mingguan(dokter_list, jumlah_dokter, jadwal_list);
+            // informasi pelanggaran
+            printf("\n[Pelanggaran] ");
+            PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, 0, 0, 1);
 
             konfirmasi();
         } else if (pilih == 3) {
             tampilkan_jadwal_bulanan(dokter_list, jumlah_dokter, jadwal_list);
+
+            // informasi pelanggaran
+            printf("\n[Pelanggaran] ");
+            PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, 0, 0, 2);
 
             konfirmasi();
         } else if (pilih == 4) {
@@ -224,6 +235,11 @@ void menu_tampilkan_jadwal(const Dokter *dokter_list, int jumlah_dokter, const J
             printf("Masukkan ID dokter: ");
             scanf("%d", &id);
             tampilkan_jadwal_dokter(dokter_list, jumlah_dokter, jadwal_list, id);
+
+            // informasi pelanggaran
+            printf("\n[Pelanggaran] ");
+            PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, id, 0, 1);
+
             konfirmasi();
         } else if (pilih == 0) {
             printf("Kembali ke menu utama...\n");
