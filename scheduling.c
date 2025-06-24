@@ -54,30 +54,34 @@ void isi_arrNotAssigned(Dokter dokter[], int idx, int **arr_notAssigned, int *no
     (*arr_notAssigned)[*notAssigned - 1] = dokter[idx].id;
 }
 
+void available_dokter(Dokter dokter[], int jumlah_dokter, int *avail_pagi, int *avail_siang, int *avail_malam){
+    for (int i = 0; i < jumlah_dokter; i++){
+        if (dokter[i].pagi == 1){
+            *avail_pagi += (dokter[i].maks_shift - dokter[i].shift_assigned);
+        }
+        if (dokter[i].siang == 1){
+            *avail_siang += (dokter[i].maks_shift - dokter[i].shift_assigned);
+        }
+        if (dokter[i].malam == 1){
+            *avail_malam += (dokter[i].maks_shift - dokter[i].shift_assigned);
+        }
+    }
+}
+
 int shift_prioritas(Dokter dokter[], int jumlah_dokter, int hari_pagi, int hari_siang, int hari_malam){
     // hitung kekosongan tiap shift
     int pagi_kosong = 7 - hari_pagi;
     int siang_kosong = 7 - hari_siang;
     int malam_kosong = 7 - hari_malam;
 
-    int available_pagi = 0; int available_siang = 0; int available_malam = 0;
+    int avail_pagi = 0; int avail_siang = 0; int avail_malam = 0;
     // hitung berapa banyak dokter yang bisa mengisi
-    for (int i = 0; i < jumlah_dokter; i++){
-        if (dokter[i].pagi == 1){
-            available_pagi += (dokter[i].maks_shift - dokter[i].shift_assigned);
-        }
-        if (dokter[i].siang == 1){
-            available_siang += (dokter[i].maks_shift - dokter[i].shift_assigned);
-        }
-        if (dokter[i].malam == 1){
-            available_malam += (dokter[i].maks_shift - dokter[i].shift_assigned);
-        }
-    }
+    available_dokter(dokter, jumlah_dokter, &avail_pagi, &avail_siang, &avail_malam);
 
     // pilih shift prioritas
-    int skor_pagi = available_pagi - pagi_kosong;
-    int skor_siang = available_siang - siang_kosong;
-    int skor_malam = available_malam - malam_kosong;
+    int skor_pagi = avail_pagi - pagi_kosong;
+    int skor_siang = avail_siang - siang_kosong;
+    int skor_malam = avail_malam - malam_kosong;
 
     int a, b, c;
     a = b = c = 10000;
@@ -173,32 +177,32 @@ void assign_sisa(Dokter dokter[], Jadwal jadwal[], int idx, int *hari_pagi, int 
     else if (assign_shift == SHIFT_MALAM) isi_jadwal(dokter, jadwal, hari_malam, idx, SHIFT_MALAM);
 }
 
-void scheduling_stage1(Dokter dokter[], Jadwal jadwal[], int *indeks, int jumlah_dokter, int *hari_pagi, int *hari_siang,
+void scheduling_stage1(Dokter dokter[], Jadwal jadwal[], int *idx, int jumlah_dokter, int *hari_pagi, int *hari_siang,
                     int *hari_malam, int **arr_notAssigned_1Pref,int *notAssigned_1Pref, int **arr_notAssigned_multi, int *notAssigned_multi){
     
-    while ((*indeks < jumlah_dokter) && (*hari_pagi < 7 || *hari_siang < 7 || *hari_malam < 7)){
-        switch (cek_1preferensi(dokter, *indeks))
+    while ((*idx < jumlah_dokter) && (*hari_pagi < 7 || *hari_siang < 7 || *hari_malam < 7)){
+        switch (cek_1preferensi(dokter, *idx))
         {
         case 1:
-            if (*hari_pagi < 7) isi_jadwal(dokter, jadwal, hari_pagi, *indeks, SHIFT_PAGI);
-            else isi_arrNotAssigned(dokter, *indeks, arr_notAssigned_1Pref, notAssigned_1Pref);
+            if (*hari_pagi < 7) isi_jadwal(dokter, jadwal, hari_pagi, *idx, SHIFT_PAGI);
+            else isi_arrNotAssigned(dokter, *idx, arr_notAssigned_1Pref, notAssigned_1Pref);
             break;
 
         case 2:
-            if (*hari_siang < 7) isi_jadwal(dokter, jadwal, hari_siang, *indeks, SHIFT_SIANG);
-            else isi_arrNotAssigned(dokter, *indeks, arr_notAssigned_1Pref, notAssigned_1Pref);
+            if (*hari_siang < 7) isi_jadwal(dokter, jadwal, hari_siang, *idx, SHIFT_SIANG);
+            else isi_arrNotAssigned(dokter, *idx, arr_notAssigned_1Pref, notAssigned_1Pref);
             break;
 
         case 3:
-            if (*hari_malam < 7) isi_jadwal(dokter, jadwal, hari_malam, *indeks, SHIFT_MALAM);
-            else isi_arrNotAssigned(dokter, *indeks, arr_notAssigned_1Pref, notAssigned_1Pref);
+            if (*hari_malam < 7) isi_jadwal(dokter, jadwal, hari_malam, *idx, SHIFT_MALAM);
+            else isi_arrNotAssigned(dokter, *idx, arr_notAssigned_1Pref, notAssigned_1Pref);
             break;
 
         default:
-            isi_arrNotAssigned(dokter, *indeks, arr_notAssigned_multi, notAssigned_multi);
+            isi_arrNotAssigned(dokter, *idx, arr_notAssigned_multi, notAssigned_multi);
             break;
         }
-        *indeks += 1;
+        *idx += 1;
     }
 }
 
@@ -230,7 +234,7 @@ void scheduling_stage2(Dokter dokter[], Jadwal jadwal[], int jumlah_dokter, int 
             if (available == tidak_bersedia) done = 1; // dokter notAssigned_multi tidak ada yang sesuai preferensi nya
         }
         // isi shift kosong dengan melakukan loop ulang list dokter.
-        else if (notAssigned_multi == 0 || done == 1){
+        else if (pelanggaran != 1){
             progress = 0; int min = 100; idx_min = 0; masuk_loop_ulang = 1;
             for (int idx = 0; idx < jumlah_dokter; idx++){
                 if (dokter[idx].shift_assigned >= dokter[idx].maks_shift) continue;
@@ -257,18 +261,14 @@ void scheduling_stage2(Dokter dokter[], Jadwal jadwal[], int jumlah_dokter, int 
                 }
             }   
             isi_jadwalPrioritas(dokter, jadwal, jumlah_dokter, prioritas, hari_pagi, hari_siang, hari_malam, idx_min, &progress, 0);
-            if (*hari_pagi == 7 && *hari_siang == 7 && *hari_malam == 7) break;
-            if (prioritas < 0){
-                pelanggaran = 1;
-                break; // tidak tersedia dokter yang sesuai preferensinya 
-            }
+            if (prioritas < 0) pelanggaran = 1; // tidak tersedia dokter yang sesuai preferensinya 
         }
         // terpaksa pelanggaran
         else if (pelanggaran == 1){
-            progress = 0; int perintah = 1; available = 0;
+            progress = 0; available = 0;
             for (int idx = 0; idx < jumlah_dokter; idx++){
                 if (dokter[idx].shift_assigned >= dokter[idx].maks_shift) continue;
-                available += 1;
+                int perintah = 1; available += 1;
                 // isi dulu dokter yang belum di-assign
                 if (count == 0){
                     if (dokter[idx].shift_assigned > 0) perintah = 0;
