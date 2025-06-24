@@ -17,9 +17,10 @@ int main() {
 
     // Baca data dari file CSV
     int jumlah_dokter = csv_to_dokter("data_dokter.csv", dokter_list, MAX_DOKTER);
-    // int jumlah_jadwal = csv_to_jadwal("jadwal.csv", jadwal_list, MAX_JADWAL);
+    int jumlah_jadwal = csv_to_jadwal("jadwal.csv", jadwal_list, 7);
 
     int jadwal_created = 0;
+    if (jumlah_jadwal) jadwal_created = 1;
 
     // Validasi
     if (jumlah_dokter < 0) {
@@ -108,9 +109,9 @@ int main() {
 
     } while (pilih != 0);
 
-    // Simpan ulang untuk uji write
-    dokter_to_csv("dokter_output.csv", dokter_list, jumlah_dokter);
-    jadwal_to_csv("jadwal_output.csv", jadwal_list, 7);
+    // Simpan5
+    dokter_to_csv("data_dokter.csv", dokter_list, jumlah_dokter);
+    jadwal_to_csv("jadwal.csv", jadwal_list, 7);
 
     // Bebaskan memori dari alokasi array dinamis dalam Jadwal
     reset_jadwal(jadwal_list, dokter_list, jumlah_dokter, 0);
