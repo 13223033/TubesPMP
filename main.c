@@ -41,6 +41,7 @@ int main() {
         if (pilih == 1) {
             if (!jadwal_created) {
                 printf("Jadwal belum dibuat! Silakan pilih opsi 3 untuk membuat jadwal terlebih dahulu.\n");
+                konfirmasi();
             } else {
                 menu_tampilkan_jadwal(dokter_list, jumlah_dokter, jadwal_list);
             }
@@ -56,10 +57,12 @@ int main() {
 
             jadwal_created = 1;
             printf("Jadwal berhasil dibuat!\n");
+            konfirmasi();
         }
         else if (pilih == 4){
             if (!jadwal_created) {
                 printf("Jadwal belum dibuat! Silakan pilih opsi 3 untuk membuat jadwal terlebih dahulu.\n");
+                konfirmasi();
             } else {
                 int id = 0; int opsi_pelanggaran;
                 puts("\n=== MENU CEK PELANGGARAN ===");
@@ -93,7 +96,14 @@ int main() {
                     printf("Pelanggaran total, sebulan:\n", id);
                     PrintPelanggaran(dokter_list, jadwal_list, jumlah_dokter, id, 0, 2);
                 }
+                konfirmasi();
             }
+        } else if (pilih == 0) {
+            printf("Keluar dari program.\n");
+        } else {
+            printf("Pilihan tidak valid. Silakan coba lagi.\n");
+            konfirmasi();
+            continue;
         }
 
     } while (pilih != 0);

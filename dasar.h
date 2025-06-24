@@ -36,5 +36,6 @@ void free_jadwal_list(Jadwal *jadwal_list, int jumlah);
 // Utilitas
 int *parse_id_list(const char *str, int *jumlah);
 void join_id_list(char *buffer, const int *arr, int jumlah);
+void konfirmasi (void);
 
 #endif
