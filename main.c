@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "dasar.h"
-#include "baca_file.h"
 #include "pelanggaran.h"
 #include "pengelolaan.h"
 #include "scheduling.h"
